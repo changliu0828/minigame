@@ -11,6 +11,7 @@ public:
     void init();
 
 private:
+    int id_;
     E_ROOM_STATUS status_;
     std::vector<Player> players_;   
 };

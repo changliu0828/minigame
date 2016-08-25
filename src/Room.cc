@@ -1,6 +1,7 @@
 #include "Room.h"
 
 Room::Room()
+:id_(0)
 {
     init();
 }

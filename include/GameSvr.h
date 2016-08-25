@@ -10,9 +10,12 @@
 #include <boost/bind.hpp>
 #include <set>
 #include "Codec.h"
+#include "Common.h"
 
 using namespace muduo;
 using namespace muduo::net;
+
+typedef std::set<TcpConnectionPtr> ConnectionList;
 
 class GameSvr : boost::noncopyable
 {
@@ -22,7 +25,7 @@ public:
 private:
     void onConnection(const TcpConnectionPtr& conn);
     void onJsonMessage(const TcpConnectionPtr& conn, const string& message, Timestamp time);
-    typedef std::set<TcpConnectionPtr> ConnectionList;
+    void onTime();
     EventLoop* loop_;
     TcpServer server_;
     LengthHeaderCodec codec_;

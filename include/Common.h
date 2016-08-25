@@ -1,6 +1,10 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#define NOTIFY_INTERVAL 1 //time interval of updating to client
+#define MAX_ROOM_NUM 10 //max room nubmers
+
+
 enum E_MSG_ID
 {
     MSG_HELLO = 0,

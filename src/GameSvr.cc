@@ -9,6 +9,7 @@ codec_(boost::bind(&GameSvr::onJsonMessage, this, _1, _2, _3))
         boost::bind(&GameSvr::onConnection, this, _1));
     server_.setMessageCallback(
         boost::bind(&LengthHeaderCodec::onMessage, &codec_, _1, _2, _3));
+    loop->runEvery(NOTIFY_INTERVAL, boost::bind(&GameSvr::onTime, this));
 }
 void GameSvr::start()
 {
@@ -33,4 +34,8 @@ void GameSvr::onConnection(const TcpConnectionPtr& conn)
 void GameSvr::onJsonMessage(const TcpConnectionPtr& conn, const string& message, Timestamp time)
 {  
     LOG_INFO << conn->name() << " recv " << message.size() << " bytes at " << time.toString();
+}
+void GameSvr::onTime()
+{
+    LOG_INFO << "onTime";
 }
