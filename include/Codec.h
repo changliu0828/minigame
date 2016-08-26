@@ -8,12 +8,17 @@
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <sstream>
+
+using namespace boost::property_tree;
 
 class LengthHeaderCodec: boost::noncopyable
 {
 public:
     typedef boost::function<void (const muduo::net::TcpConnectionPtr&,
-                                  const muduo::string& message,
+                                  const ptree& ,
                                   muduo::Timestamp)> JsonMessageCallback;
 
     
@@ -39,7 +44,23 @@ public:
             {
                 buf->retrieve(kHeaderLen);
                 muduo::string message(buf->peek(), len);
-                messageCallback_(conn, message, receiveTime);
+                try 
+                {
+                    std::stringstream stream;
+                    stream << message;
+                    read_json(stream, jsontree_);    //read json
+                }
+                catch (json_parser::json_parser_error &e)
+                {  
+                    LOG_ERROR << "Fiaild to read json string, message: " << message << e.what(); 
+                    return;
+                }
+                catch (...)
+                {
+                    LOG_ERROR << "Fiaild to read json string with unknown exception, message: " << message; 
+                    return;
+                }
+                messageCallback_(conn, jsontree_, receiveTime);
                 buf->retrieve(len);
             }
             else
@@ -49,9 +70,14 @@ public:
         } 
     }
     void send(muduo::net::TcpConnectionPtr &conn,
-              const muduo::StringPiece& message)
+                const ptree& jsontree)
     {
         muduo::net::Buffer buf;
+        muduo::StringPiece message;
+        std::stringstream stream;
+        write_json(stream, jsontree);
+        message = stream.str();
+
         buf.append(message.data(), message.size());
         int32_t len = static_cast<int32_t>(message.size());
         int32_t be32 = muduo::net::sockets::hostToNetwork32(len);
@@ -62,5 +88,6 @@ public:
 private:
     JsonMessageCallback messageCallback_;
     const static size_t kHeaderLen = sizeof(int32_t);
+    boost::property_tree::ptree jsontree_;
 };
 #endif

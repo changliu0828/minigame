@@ -31,9 +31,10 @@ void GameSvr::onConnection(const TcpConnectionPtr& conn)
     }
  
 }
-void GameSvr::onJsonMessage(const TcpConnectionPtr& conn, const string& message, Timestamp time)
+void GameSvr::onJsonMessage(const TcpConnectionPtr& conn, const ptree& jsontree, Timestamp time)
 {  
-    LOG_INFO << conn->name() << " recv " << message.size() << " bytes at " << time.toString();
+    int msgID = jsontree.get<int>("MSG_ID");
+    LOG_INFO << conn->name() << " MSG_ID: " << msgID  << "at " << time.toString();
 }
 void GameSvr::onTime()
 {

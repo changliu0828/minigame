@@ -8,7 +8,7 @@
 enum E_MSG_ID
 {
     MSG_HELLO = 0,
-    MSG_MATCH = 1,
+    MSG_MATCH = 1,  //match game
     MAS_ACT =   2
 };
 

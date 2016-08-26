@@ -8,13 +8,15 @@
 #include <muduo/net/InetAddress.h>
 
 #include <boost/bind.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <set>
 #include "Codec.h"
 #include "Common.h"
 
 using namespace muduo;
 using namespace muduo::net;
-
+using namespace boost::property_tree;
 typedef std::set<TcpConnectionPtr> ConnectionList;
 
 class GameSvr : boost::noncopyable
@@ -24,7 +26,7 @@ public:
     void start();
 private:
     void onConnection(const TcpConnectionPtr& conn);
-    void onJsonMessage(const TcpConnectionPtr& conn, const string& message, Timestamp time);
+    void onJsonMessage(const TcpConnectionPtr& conn, const ptree& jsontree, Timestamp time);
     void onTime();
     EventLoop* loop_;
     TcpServer server_;
