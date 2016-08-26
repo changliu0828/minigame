@@ -13,6 +13,7 @@
 #include <set>
 #include "Codec.h"
 #include "Common.h"
+#include "GameMng.h"
 
 using namespace muduo;
 using namespace muduo::net;
@@ -28,10 +29,13 @@ private:
     void onConnection(const TcpConnectionPtr& conn);
     void onJsonMessage(const TcpConnectionPtr& conn, const ptree& jsontree, Timestamp time);
     void onTime();
+    void doByMsgType(int msgType, const TcpConnectionPtr& conn);
+    void doReqMatch(const TcpConnectionPtr& conn);
     EventLoop* loop_;
     TcpServer server_;
     LengthHeaderCodec codec_;
     ConnectionList connections_;
+    GameMng gameMng_;
 };
 
 #endif

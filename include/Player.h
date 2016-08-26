@@ -3,14 +3,17 @@
 
 #include "Atom.h"
 #include <muduo/base/Types.h>
+#include <muduo/net/TcpConnection.h>
+
 using namespace muduo;
+using namespace muduo::net;
 
 class Player : public Atom
 {
 public:
-    Player();
+    Player(string id);
 private:
-    string id_; // = TcpConnetciont.name()
+    string id_;
     string name_;
 };
 

@@ -1,6 +1,7 @@
 #include "Player.h"
 
-Player::Player()
+Player::Player(string id)
+:id_(id)
 {
     
 }

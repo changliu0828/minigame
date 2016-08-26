@@ -7,13 +7,17 @@
 class Room 
 {
 public:
-    Room();
+    Room(int id);
     void init();
-
+    void addPlayer(Player player);
+    void Start();
+    void Empty();
+    void Wait();
 private:
     int id_;
     E_ROOM_STATUS status_;
     std::vector<Player> players_;   
+ 
 };
 
 
