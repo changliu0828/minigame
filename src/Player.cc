@@ -5,3 +5,7 @@ Player::Player(string id)
 {
     
 }
+string Player::getId()
+{
+    return id_; 
+}

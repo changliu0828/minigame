@@ -1,13 +1,15 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include <muduo/base/Logging.h>
+
 #define CLIENT_FREQ  30 // client update frequence
 #define MAX_ROOM_NUM 10 // max room nubmers
 #define GAME_TIME 5     //5 minute
 #define PLAYER_NUM_PER_ROOM 2 
 enum E_MSG_TYPE
 {
-    MSG_MATCH_REQ = 0,  //      {"MSG_TYPE":0}
+    MSG_MATCH_REQ = 0,  //      {"MSG_TYPE":0, "NAME":""}
     MSG_MATCH_RSP = 1,  //      {"MSG_TYPE":1, "RET":0, "VALUE":[bornX, bornY])}
                         //      {"MSG_TYPE":1, "RET":1, "REASON":E_REASON)}                              
     MSG_FRAME_REQ = 2,  //      {"MSG_TYPE":2, "FRAME_SEQ":0...GAME_TIME*60*CLIENT_FREQ, "ACT":""}

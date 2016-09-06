@@ -9,8 +9,10 @@ codec_(boost::bind(&GameSvr::onJsonMessage, this, _1, _2, _3))
         boost::bind(&GameSvr::onConnection, this, _1));
     server_.setMessageCallback(
         boost::bind(&LengthHeaderCodec::onMessage, &codec_, _1, _2, _3));
-    loop->runEvery(1, boost::bind(&GameSvr::onTime, this));
-    
+ //   loop->runEvery(1, boost::bind(&GameSvr::onTime, this));
+    LengthHeaderCodec* pCodec = &codec_;
+    boost::shared_ptr<LengthHeaderCodec> codecPtr(pCodec);
+    this->gameMng_.setCodec(codecPtr);
 }
 void GameSvr::start()
 {
@@ -24,26 +26,26 @@ void GameSvr::onConnection(const TcpConnectionPtr& conn)
              << (conn->connected() ? "UP" : "DOWN");
     if (conn->connected())
     {
-        connections_.insert(conn);
+        gameMng_.connUp(conn);
     }
     else
     {
-        connections_.erase(conn);
+        gameMng_.connDown(conn);         
     }
  
 }
 void GameSvr::onJsonMessage(const TcpConnectionPtr& conn, const ptree& jsontree, Timestamp time)
 {  
     int msgType = jsontree.get<int>("MSG_TYPE");
-    LOG_INFO << conn->name() << " MSG_TYPE: " << msgType  << "at " << time.toString();
+    LOG_INFO << conn->name() << " MSG_TYPE: " << msgType  << " at " << time.toString();
 
-    doByMsgType(msgType, conn);
+    doByMsgType(msgType, conn, jsontree);
 }
 void GameSvr::onTime()
 {
     LOG_INFO << "onTime";
 }
-void GameSvr::doByMsgType(int msgType, const TcpConnectionPtr& conn)
+void GameSvr::doByMsgType(int msgType, const TcpConnectionPtr& conn, const ptree &jsontree)
 {
     switch (msgType) 
     {
@@ -54,6 +56,7 @@ void GameSvr::doByMsgType(int msgType, const TcpConnectionPtr& conn)
         }
         case MSG_FRAME_REQ:
         {
+            doReqFrame(conn, jsontree);
             break;
         }
     }   
@@ -62,3 +65,9 @@ void GameSvr::doReqMatch(const TcpConnectionPtr& conn)
 {
     gameMng_.sitDown(conn);
 }
+void GameSvr::doReqFrame(const TcpConnectionPtr& conn, const ptree &jsontree)
+{
+    LOG_INFO << "doReqFrame";
+    gameMng_.reqFrame(conn, jsontree);
+}
+

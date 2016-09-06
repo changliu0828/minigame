@@ -10,6 +10,7 @@ public:
     Room(int id);
     void init();
     void addPlayer(Player player);
+    Player& getAnotherPlayer(string myName);
     void Start();
     void Empty();
     void Wait();

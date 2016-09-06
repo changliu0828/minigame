@@ -7,12 +7,17 @@
 #include <muduo/net/TcpConnection.h>
 
 #include <boost/function.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <sstream>
 
 using namespace boost::property_tree;
+
+class LengthHeaderCodec;
+
+typedef boost::shared_ptr<LengthHeaderCodec> LengthHeaderCodecPtr;
 
 class LengthHeaderCodec: boost::noncopyable
 {
