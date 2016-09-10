@@ -11,9 +11,12 @@ class Player
 {
 public:
     Player(string id);
-    string getId();
+    string getID();
+    string getName();
+    void setName(string name);
 private:
     string id_;
+    string name_;
 };
 
 #endif

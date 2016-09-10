@@ -25,11 +25,11 @@ public:
     void start();
 private:
     void onConnection(const TcpConnectionPtr& conn);
-    void onJsonMessage(const TcpConnectionPtr& conn, const ptree& jsontree, Timestamp time);
+    void onJsonMessage(const TcpConnectionPtr& conn, ptree& jsontree, Timestamp time);
     void onTime();
-    void doByMsgType(int msgType, const TcpConnectionPtr& conn, const ptree& jsontree);
-    void doReqMatch(const TcpConnectionPtr& conn);
-    void doReqFrame(const TcpConnectionPtr& conn, const ptree& jsontree);
+    void doByMsgType(int msgType, const TcpConnectionPtr& conn, ptree& jsontree);
+    void doSitDown(const TcpConnectionPtr& conn, const ptree& jsontree);
+    void doFrame(const TcpConnectionPtr& conn, ptree& jsontree);
     EventLoop* loop_;
     TcpServer server_;
     LengthHeaderCodec codec_;

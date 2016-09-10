@@ -18,10 +18,13 @@ class GameMng
 public:
     GameMng();
     void setCodec(LengthHeaderCodecPtr codecPtr);
-    void sitDown(const TcpConnectionPtr& conn);
+    void sitDown(const TcpConnectionPtr& conn, const ptree& jsontree);
     void connUp(const TcpConnectionPtr& conn);
     void connDown(const TcpConnectionPtr& conn);
-    void reqFrame(const TcpConnectionPtr& conn, const ptree& jsontree);
+    void reqSitDown(const TcpConnectionPtr& conn, E_ROOM_STATUS status, bool isMaster = false);
+    void reqFrame(const TcpConnectionPtr& conn, ptree& jsontree);
+    void reqEvent(const TcpConnectionPtr& conn, E_EVENT_TYPE event);
+
 private:
     LengthHeaderCodecPtr codecPtr_;
     ConnectionMap connections_;

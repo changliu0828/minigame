@@ -1,6 +1,7 @@
 #include <muduo/net/TcpServer.h>
 #include <muduo/base/AsyncLogging.h>
 #include <muduo/base/Logging.h>
+#include <muduo/base/TimeZone.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/InetAddress.h>
 
@@ -33,6 +34,10 @@ void setLogging(const char* argv0)
 int main(int argc, char* argv[])
 {
   setLogging(argv[0]);
+  muduo::Logger::setLogLevel(muduo::Logger::DEBUG);
+  TimeZone tz(8, "ShangHai");
+  muduo::Logger::setTimeZone(tz);
+
 
   LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
   EventLoop loop;

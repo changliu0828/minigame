@@ -34,10 +34,10 @@ void GameSvr::onConnection(const TcpConnectionPtr& conn)
     }
  
 }
-void GameSvr::onJsonMessage(const TcpConnectionPtr& conn, const ptree& jsontree, Timestamp time)
+void GameSvr::onJsonMessage(const TcpConnectionPtr& conn, ptree& jsontree, Timestamp time)
 {  
-    int msgType = jsontree.get<int>("MSG_TYPE");
-    LOG_INFO << conn->name() << " MSG_TYPE: " << msgType  << " at " << time.toString();
+    int msgType = jsontree.get<int>("msg_type");
+    LOG_INFO << conn->name() << " msg_type: " << msgType  << " at " << time.toString();
 
     doByMsgType(msgType, conn, jsontree);
 }
@@ -45,29 +45,28 @@ void GameSvr::onTime()
 {
     LOG_INFO << "onTime";
 }
-void GameSvr::doByMsgType(int msgType, const TcpConnectionPtr& conn, const ptree &jsontree)
+void GameSvr::doByMsgType(int msgType, const TcpConnectionPtr& conn, ptree &jsontree)
 {
     switch (msgType) 
     {
-        case MSG_MATCH_REQ:
+        case MSG_SITDOWN_REQ:
         {
-            doReqMatch(conn);
+            doSitDown(conn, jsontree);
             break;
         }
         case MSG_FRAME_REQ:
         {
-            doReqFrame(conn, jsontree);
+            doFrame(conn, jsontree);
             break;
         }
     }   
 }
-void GameSvr::doReqMatch(const TcpConnectionPtr& conn)
+void GameSvr::doSitDown(const TcpConnectionPtr& conn, const ptree &jsontree)
 {
-    gameMng_.sitDown(conn);
+    gameMng_.sitDown(conn, jsontree);
 }
-void GameSvr::doReqFrame(const TcpConnectionPtr& conn, const ptree &jsontree)
+void GameSvr::doFrame(const TcpConnectionPtr& conn, ptree &jsontree)
 {
-    LOG_INFO << "doReqFrame";
     gameMng_.reqFrame(conn, jsontree);
 }
 

@@ -10,10 +10,11 @@ public:
     Room(int id);
     void init();
     void addPlayer(Player player);
+    void erasePlayer(string name);
+    void eraseAllPlayer();
     Player& getAnotherPlayer(string myName);
-    void Start();
-    void Empty();
-    void Wait();
+    void setStatus(E_ROOM_STATUS status);
+    E_ROOM_STATUS getStatus();
 private:
     int id_;
     E_ROOM_STATUS status_;

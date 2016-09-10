@@ -23,7 +23,7 @@ class LengthHeaderCodec: boost::noncopyable
 {
 public:
     typedef boost::function<void (const muduo::net::TcpConnectionPtr&,
-                                  const ptree& ,
+                                  ptree& ,
                                   muduo::Timestamp)> JsonMessageCallback;
 
     
@@ -39,6 +39,7 @@ public:
         while (buf->readableBytes() >= kHeaderLen)
         {
             const int32_t len = buf->peekInt32();
+            LOG_DEBUG << "Length: " << len;
             if (len > 65536 || len < 0)
             {
                 LOG_ERROR << "Invalid length " << len;
@@ -53,16 +54,18 @@ public:
                 {
                     std::stringstream stream;
                     stream << message;
-                    read_json(stream, jsontree_);    //read json
+                    read_json(stream, jsontree_); 
                 }
                 catch (json_parser::json_parser_error &e)
                 {  
                     LOG_ERROR << "Fiaild to read json string, message: " << message << e.what(); 
+                    buf->retrieve(len);
                     return;
                 }
                 catch (...)
                 {
                     LOG_ERROR << "Fiaild to read json string with unknown exception, message: " << message; 
+                    buf->retrieve(len);
                     return;
                 }
                 messageCallback_(conn, jsontree_, receiveTime);
@@ -74,7 +77,7 @@ public:
             }
         } 
     }
-    void send(muduo::net::TcpConnectionPtr &conn,
+    void send(const muduo::net::TcpConnectionPtr &conn,
                 const ptree& jsontree)
     {
         muduo::net::Buffer buf;

@@ -22,29 +22,38 @@ void Room::addPlayer(Player player)
         players_.push_back(player);
     } 
 }
+void Room::erasePlayer(string name)
+{
+    for (std::vector<Player>::iterator it  = players_.begin(); it != players_.end(); it++)
+    {
+        if (it->getID() == name)
+        {
+            players_.erase(it);
+            return;
+        }
+    }   
+}
+void Room::eraseAllPlayer()
+{
+   players_.clear();
+}
 Player& Room::getAnotherPlayer(string myName) {
     std::vector<Player>::iterator it =  players_.begin(); 
     for (;it != players_.end(); it ++)
     {
-        if (it->getId() != myName)
+        if (it->getID() != myName)
         {
-            LOG_DEBUG << "Another Player: " << it->getId();
+            LOG_DEBUG << "Another Player: " << it->getID();
             return (*it);
         }
     } 
     return (*it);
 }
-void Room::Start()
+void Room::setStatus(E_ROOM_STATUS status)
 {
-    status_ = ROOM_START;
-    //TODO:send client with born pos 
+    status_ = status;
 }
-void Room::Wait()
+E_ROOM_STATUS Room::getStatus()
 {
-    status_ = ROOM_WAIT;
+    return status_;
 }
-void Room::Empty()
-{
-    status_ = ROOM_EMPTY;
-}
-   
