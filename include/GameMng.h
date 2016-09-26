@@ -21,9 +21,9 @@ public:
     void sitDown(const TcpConnectionPtr& conn, const ptree& jsontree);
     void connUp(const TcpConnectionPtr& conn);
     void connDown(const TcpConnectionPtr& conn);
-    void reqSitDown(const TcpConnectionPtr& conn, E_ROOM_STATUS status, bool isMaster = false);
-    void reqFrame(const TcpConnectionPtr& conn, ptree& jsontree);
-    void reqEvent(const TcpConnectionPtr& conn, E_EVENT_TYPE event);
+    void rspSitDown(const TcpConnectionPtr& conn, E_ROOM_STATUS status, bool isMaster = false);
+    void rspFrame(const TcpConnectionPtr& conn, ptree& jsontree);
+    void rspEvent(const TcpConnectionPtr& conn, E_EVENT_TYPE event);
 
 private:
     LengthHeaderCodecPtr codecPtr_;

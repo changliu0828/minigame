@@ -33,10 +33,10 @@ void setLogging(const char* argv0)
 
 int main(int argc, char* argv[])
 {
-  setLogging(argv[0]);
-  muduo::Logger::setLogLevel(muduo::Logger::DEBUG);
   TimeZone tz(8, "ShangHai");
   muduo::Logger::setTimeZone(tz);
+  muduo::Logger::setLogLevel(muduo::Logger::DEBUG);
+  setLogging(argv[0]);
 
 
   LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();

@@ -39,7 +39,7 @@ public:
         while (buf->readableBytes() >= kHeaderLen)
         {
             const int32_t len = buf->peekInt32();
-            LOG_DEBUG << "Length: " << len;
+            LOG_DEBUG << "Receiven Message Length: " << len;
             if (len > 65536 || len < 0)
             {
                 LOG_ERROR << "Invalid length " << len;
@@ -80,14 +80,15 @@ public:
     void send(const muduo::net::TcpConnectionPtr &conn,
                 const ptree& jsontree)
     {
-        muduo::net::Buffer buf;
-        muduo::StringPiece message;
+        muduo::net::Buffer buf(4096);
+        std::string  message;
         std::stringstream stream;
         write_json(stream, jsontree);
         message = stream.str();
 
         buf.append(message.data(), message.size());
         int32_t len = static_cast<int32_t>(message.size());
+        LOG_DEBUG << "Send Message Length: " << len;
         int32_t be32 = muduo::net::sockets::hostToNetwork32(len);
         buf.prepend(&be32, sizeof be32);
         conn->send(&buf);

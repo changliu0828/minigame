@@ -38,7 +38,6 @@ void GameSvr::onJsonMessage(const TcpConnectionPtr& conn, ptree& jsontree, Times
 {  
     int msgType = jsontree.get<int>("msg_type");
     LOG_INFO << conn->name() << " msg_type: " << msgType  << " at " << time.toString();
-
     doByMsgType(msgType, conn, jsontree);
 }
 void GameSvr::onTime()
@@ -67,6 +66,6 @@ void GameSvr::doSitDown(const TcpConnectionPtr& conn, const ptree &jsontree)
 }
 void GameSvr::doFrame(const TcpConnectionPtr& conn, ptree &jsontree)
 {
-    gameMng_.reqFrame(conn, jsontree);
+    gameMng_.rspFrame(conn, jsontree);
 }
 

@@ -48,14 +48,14 @@ void GameMng::sitDown(const TcpConnectionPtr& conn, const ptree &jsontree)
         mapConnNameRoomID_.insert(std::pair<muduo::string, int>(conn->name(), tmppair.first));
 
         //send to slave
-        reqSitDown(conn,ROOM_START, false);
+        rspSitDown(conn,ROOM_START, false);
 
         // send to master 
         std::map<int, Room>::iterator it = startRooms_.find(tmppair.first);
         string otherName = it->second.getAnotherPlayer(conn->name()).getID();
         TcpConnectionPtr otherConn = connections_[otherName];
 
-        reqSitDown(otherConn,ROOM_START, true);
+        rspSitDown(otherConn,ROOM_START, true);
   
         LOG_INFO << "Player: " << conn->name() << " Sit Down in Waiting Room: " << tmppair.first; 
     }
@@ -72,7 +72,7 @@ void GameMng::sitDown(const TcpConnectionPtr& conn, const ptree &jsontree)
         emptyRooms_.erase(emptyRooms_.begin());
         waitRooms_.insert(tmppair);
 
-        reqSitDown(conn,ROOM_WAIT);
+        rspSitDown(conn,ROOM_WAIT);
 
         mapConnNameRoomID_.insert(std::pair<muduo::string, int>(conn->name(), tmppair.first));
         LOG_INFO << "Player: " << conn->name() << " Sit Down in Empty Room: " << tmppair.first; 
@@ -80,7 +80,7 @@ void GameMng::sitDown(const TcpConnectionPtr& conn, const ptree &jsontree)
     else
     {
         LOG_INFO << "No Enough Rooms for " << conn->name();  
-        reqEvent(conn, EVENT_NO_EMPTY_ROOM);
+        rspEvent(conn, EVENT_NO_EMPTY_ROOM);
     }
 }
 void GameMng::connUp(const TcpConnectionPtr& conn) 
@@ -97,11 +97,11 @@ void GameMng::connDown(const TcpConnectionPtr& conn)
         
         if ((itRoom = startRooms_.find(itRoomID->second)) != startRooms_.end())
         {
-            LOG_INFO << "Connection is in a start-room";
+            LOG_INFO << "connDown > Connection is in a start-room";
             //notify the other player
             string partnerID = itRoom->second.getAnotherPlayer(conn->name()).getID();
             TcpConnectionPtr partnerConn = connections_[partnerID];
-            reqEvent(partnerConn, EVENT_PARTNER_QUIT);
+            rspEvent(partnerConn, EVENT_PARTNER_QUIT);
             
             itRoom->second.eraseAllPlayer();
             itRoom->second.setStatus(ROOM_EMPTY);
@@ -111,7 +111,7 @@ void GameMng::connDown(const TcpConnectionPtr& conn)
         }
         else if ((itRoom = waitRooms_.find(itRoomID->second)) != waitRooms_.end())
         {
-            LOG_INFO << "Connection is in a wait-room";
+            LOG_INFO << "connDown > Connection is in a wait-room";
             itRoom->second.eraseAllPlayer();
             itRoom->second.setStatus(ROOM_EMPTY);
 
@@ -120,17 +120,17 @@ void GameMng::connDown(const TcpConnectionPtr& conn)
         }
         else if ((itRoom = emptyRooms_.find(itRoomID->second)) != emptyRooms_.end())
         {
-            LOG_ERROR << "Connection is in a empty-room";
+            LOG_INFO << "connDown > Connection is in a empty-room";
         }
         else
         {
-            LOG_INFO << "Connection is not in a room";
+            LOG_ERROR << "connDown > Connection is not in a room";
         }
         mapConnNameRoomID_.erase(itRoomID);
     }
     connections_.erase(conn->name());
 }
-void GameMng::reqSitDown(const TcpConnectionPtr& conn, E_ROOM_STATUS status, bool isMaster)
+void GameMng::rspSitDown(const TcpConnectionPtr& conn, E_ROOM_STATUS status, bool isMaster)
 {
     boost::property_tree::ptree jsontree;
     jsontree.put("msg_type", MSG_SITDOWN_RSP);
@@ -138,22 +138,21 @@ void GameMng::reqSitDown(const TcpConnectionPtr& conn, E_ROOM_STATUS status, boo
     jsontree.put("isMaster", isMaster);
     codecPtr_->send(conn, jsontree);
 }
-void GameMng::reqFrame(const TcpConnectionPtr& conn, ptree& jsontree)
+void GameMng::rspFrame(const TcpConnectionPtr& conn, ptree& jsontree)
 {
-    //TODO : Do this must be called by master?
     if (!conn) 
     {
-        LOG_ERROR<<"Ptr is NULL";
+        LOG_ERROR<<"TcpConnectionPtr is NULL";
         return;
     }
     if (connections_.find(conn->name()) == connections_.end())
     {
-        LOG_ERROR<<"Connection not exist: "<<conn->name();
+        LOG_ERROR<<"Connection does not exist: "<<conn->name();
         return;
     }
     if (mapConnNameRoomID_.find(conn->name()) == mapConnNameRoomID_.end())
     {
-        LOG_ERROR<<"Connection not in Room: "<<conn->name();
+        LOG_ERROR<<"Connection is not in Room: "<<conn->name();
         return;
     }
     int roomID = mapConnNameRoomID_[conn->name()];
@@ -162,24 +161,24 @@ void GameMng::reqFrame(const TcpConnectionPtr& conn, ptree& jsontree)
    
     if (it == startRooms_.end())
     {
-        LOG_ERROR<<"Room does not start.";
+        LOG_ERROR<<"Room does not start";
         return;
     }
 
     string partnerID = it->second.getAnotherPlayer(conn->name()).getID();
     TcpConnectionPtr partnerConn = connections_[partnerID];
     //modify the msg_type
-    jsontree.put("msg_type", MSG_FRAME_RSP);
-    codecPtr_->send(otherConn, jsontree);
+    //jsontree.put("msg_type", MSG_FRAME_RSP);
+
+    codecPtr_->send(partnerConn, jsontree);
 }
-void GameMng::reqEvent(const TcpConnectionPtr& conn, E_EVENT_TYPE event)
+void GameMng::rspEvent(const TcpConnectionPtr& conn, E_EVENT_TYPE event)
 {
     if (!conn) 
     {
-        LOG_ERROR<<"Ptr is NULL";
+        LOG_ERROR<<"TcpConnectionPtr is NULL";
         return;
     }
-
     boost::property_tree::ptree jsontree;
     jsontree.put("msg_type", MSG_EVENT_RSP);
     jsontree.put("event_type", event);
